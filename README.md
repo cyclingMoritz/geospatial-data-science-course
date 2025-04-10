@@ -12,8 +12,7 @@ Each module below contains a collection of notebooks with practical exercises an
 ---
 
 ### 📂 Module 2 – Mobility Data Sources & Open Data
-- [02_01_open_data_sources.ipynb](https://colab.research.google.com/github/tamagusko/geospatial-data-science-course/blob/main/notebooks/module2/02_01_open_data_sources.ipynb)
-- [02_02_osm_basics.ipynb](https://colab.research.google.com/github/tamagusko/geospatial-data-science-course/blob/main/notebooks/module2/02_02_osm_basics.ipynb)
+- [module_2_episode_8_osm_intro.ipynb](https://colab.research.google.com/github/tamagusko/geospatial-data-science-course/blob/main/notebooks/module2/module_2_episode_8_osm_intro.ipynb)
 
 ---
 
