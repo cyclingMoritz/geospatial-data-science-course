@@ -23,10 +23,14 @@ To run the notebooks on your machine:
 2. Clone the repository:
    ```bash
    git clone https://github.com/your-username/urban-mobility-notebooks.git
+   ```
+3. Install the required packages:
+   ```bash   
    cd urban-mobility-notebooks
    pip install -r requirements.txt
+   ```
+4. Start Jupyter Notebook:
+   ```bash
    jupyter notebook
    ``` 
-3. Open the notebook you want to run in your browser.
-4. Follow the instructions in the notebook to execute the code cells.
-5. Make sure to install any additional dependencies as needed.   
+5. Open the notebook in the folder notebooks.
