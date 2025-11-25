@@ -12,34 +12,13 @@ def apply_severity_filters(df):
         return df_filtered
 
     # 2 Light accidents
-    if st.sidebar.toggle("Filter by number of minor injuries", True):
-
-        only_zero_light = st.sidebar.checkbox("Only accidents with 0 minor injuries")
-
-        if only_zero_light:
-            df_filtered = df_filtered[df_filtered["minor_injuries_30d"] == 0]
-
-        else:
-            light_range = st.sidebar.slider(
-                "Victims with minor injuries",
-                min_value=int(df["minor_injuries_30d"].min()),
-                max_value=int(df["minor_injuries_30d"].max()),
-                value=(int(df["minor_injuries_30d"].min()), int(df["minor_injuries_30d"].max()))
-            )
-            df_filtered = df_filtered[df_filtered["minor_injuries_30d"].between(*light_range)]
+    df_filtered = add_injury_filter(df_filtered,column="minor_injuries_30d",label="minor injuries")
 
     #2 Severe accidents
-    if st.sidebar.toggle("Filter by number of severe injuries", False):
-        light_range = st.sidebar.slider(
-            "Victims with severe injuries",
-            min_value=int(df["serious_injuries_30d"].min()),
-            max_value=int(df["serious_injuries_30d"].max()),
-            value=(int(df["serious_injuries_30d"].min()), int(df["serious_injuries_30d"].max()))
-        )
-        df_filtered = df_filtered[df_filtered["serious_injuries_30d"].between(*light_range)]
+    df_filtered = add_injury_filter(df_filtered,column="serious_injuries_30d",label="severe injuries")
 
     #2 Fatal accidents
-    df_filtered = add_injury_filter(df,column="fatalities_30d",label="fatalities")
+    df_filtered = add_injury_filter(df_filtered,column="fatalities_30d",label="fatalities")
 
 
     return df_filtered
@@ -91,3 +70,21 @@ def add_injury_filter(
         return df[df[column].between(*value_range)]
 
     return df
+
+
+#Initial version
+    # if st.sidebar.toggle("Filter by number of minor injuries", True):
+
+    #     only_zero_light = st.sidebar.checkbox("Only accidents with 0 minor injuries")
+
+    #     if only_zero_light:
+    #         df_filtered = df_filtered[df_filtered["minor_injuries_30d"] == 0]
+
+    #     else:
+    #         light_range = st.sidebar.slider(
+    #             "Victims with minor injuries",
+    #             min_value=int(df["minor_injuries_30d"].min()),
+    #             max_value=int(df["minor_injuries_30d"].max()),
+    #             value=(int(df["minor_injuries_30d"].min()), int(df["minor_injuries_30d"].max()))
+    #         )
+    #         df_filtered = df_filtered[df_filtered["minor_injuries_30d"].between(*light_range)]
