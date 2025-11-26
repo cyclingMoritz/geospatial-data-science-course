@@ -43,18 +43,22 @@ def plot_accident_data(df):
         )
         selected_metrics = [metric_options[label] for label in selected_metric_labels]
 
+
     # Plot type selector
     with col3:
         plot_types = ["Bar", "Line", "Pie"]
         selected_plot = st.selectbox("📊 Plot type", plot_types)
 
     # ---------------------
-    # PIE CHART VALIDATION
+    # CHART VALIDATION
     # ---------------------
     if selected_plot == "Pie" and len(selected_metrics) != 1:
         st.warning("⚠️ Pie charts require selecting exactly **1 metric**. Please adjust the metric selection.")
         return  # Stop here safely, no exception raised
 
+    if len(selected_metrics)==0:
+        st.warning("⚠️ Charts need at least **1 metric**. Please adjust the metric selection.")
+        return  # Stop here safely, no exception raised
 
     # ---------------------
     # GENERATE DYNAMIC TITLE
@@ -94,6 +98,7 @@ def plot_accident_data(df):
                   .size()
                   .reset_index(name="value")
             )
+            metric="Number of accidents"
         else:
             # Sum injuries/fatalities
             grouped = (
@@ -149,6 +154,7 @@ def plot_accident_data(df):
                 values="value",
                 title=f"{title} — {metric_label}"
             )
+
 
         st.plotly_chart(fig, use_container_width=True)
 
