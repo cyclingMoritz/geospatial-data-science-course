@@ -5,7 +5,7 @@ def apply_severity_filters(df):
     df_filtered = df.copy()
 
     #1 Severity filters
-    severity_toggle = st.sidebar.toggle("**Accident severity filters**", True)
+    severity_toggle = st.sidebar.toggle("**Accident severity filters**", False)
 
 
     if not severity_toggle:
