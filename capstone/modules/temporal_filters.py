@@ -3,8 +3,12 @@ import streamlit as st
 
 def apply_temporal_filters(df):
     df_filtered = df.copy()
+    
     #1 Temporal filters
     temporal_toggle = st.sidebar.toggle("**Temporal filters**", False)
+    #Generate the date attribute
+    date_str = df["day"].astype(str).str.zfill(2) + " " + df["month"].astype(str) + " 2023"
+    df_filtered["date"] = pd.to_datetime(date_str, errors="coerce")
 
 
     if not temporal_toggle:
@@ -45,10 +49,6 @@ def apply_temporal_filters(df):
 
     #2 Filter by date interval
     if st.sidebar.toggle("Filter between dates", False):
-
-        date_str = df["day"].astype(str).str.zfill(2) + " " + df["month"].astype(str) + " 2023"
-        df_filtered["date"] = pd.to_datetime(date_str, errors="coerce")
-
         date_interval = st.sidebar.date_input(
             "Pick to dates to use for filtering",
             (df_filtered["date"].min(), df_filtered["date"].max())
