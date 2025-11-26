@@ -7,6 +7,7 @@ from modules.stats import compute_overview, dataset_inspection
 from modules.temporal_filters import apply_temporal_filters
 from modules.severity_filters import apply_severity_filters
 from modules.map_utils import df_to_gdf, create_map
+from modules.plots import plot_accident_data
 
 st.set_page_config(page_title="Lisbon Road Accidents", layout="wide")
 st.title("Lisbon Road Accidents – Interactive Dashboard")
@@ -38,10 +39,16 @@ st.markdown("Some other key characteristics of the dataset are that the number o
             )
 st.dataframe(df.head())
 
+
 # Apply sidebar filters
 st.sidebar.header("Filter Options")
 df_filtered = apply_temporal_filters(df)
 df_filtered = apply_severity_filters(df_filtered)
+
+#Generate plots
+plot_accident_data(df_filtered)
+
+
 
 # Create map
 gdf = df_to_gdf(df_filtered)
