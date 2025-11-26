@@ -6,7 +6,7 @@ from modules.stats import load_data,compute_overview, dataset_inspection
 from modules.temporal_filters import apply_temporal_filters
 from modules.severity_filters import apply_severity_filters
 from modules.map_utils import df_to_gdf, create_map
-from modules.plots import plot_accident_data, accident_plot
+from modules.plots import accident_plot_controls, accident_plot
 
 st.set_page_config(page_title="Lisbon Road Accidents", layout="wide")
 st.title("Lisbon Road Accidents – Interactive Dashboard")
@@ -105,8 +105,8 @@ df_filtered = apply_temporal_filters(clean_df,False)
 df_filtered = apply_severity_filters(df_filtered,False)
 
 with st.expander("📊 Wanna explore more? Set your own filters!", expanded=True):
-    # Generate the interactive plots with the filtered data
-    plot_accident_data(df_filtered)
+     accident_plot_controls(clean_df)
+
 
 
 
