@@ -2,13 +2,26 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-def plot_accident_data(df):
+def accident_plot_controls(df):
+    """Display selectors and return the user choices."""
 
+    # ---- Fix ordering for month and weekday ----
+    MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun",
+                   "Jul","Aug","Sep","Oct","Nov","Dec"]
+
+    WEEKDAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
+    if "month" in df.columns:
+        df["month"] = pd.Categorical(df["month"], categories=MONTH_ORDER, ordered=True)
+
+    if "weekday" in df.columns:
+        df["weekday"] = pd.Categorical(df["weekday"], categories=WEEKDAY_ORDER, ordered=True)
 
     # ---- Breakdown options ----
-    breakdown_options = ["month","weekday", "hour",  "day","date"]
+    breakdown_options = ["month","weekday", "hour", "day","date"]
 
     # ---- Metric options ----
+    df["total_victims"] = df["minor_injuries_30d"] + df["serious_injuries_30d"] + df["fatalities_30d"]
     metric_options = {
         "Number of accidents": None,
         "Minor injuries": "minor_injuries_30d",
@@ -32,129 +45,21 @@ def plot_accident_data(df):
         )
         selected_metrics = [metric_options[label] for label in selected_metric_labels]
 
-
     # Plot type selector
     with col3:
         plot_types = ["Bar", "Line", "Pie"]
         selected_plot = st.selectbox("📊 Plot type", plot_types)
 
-    # ---------------------
-    # CHART VALIDATION
-    # ---------------------
-    if selected_plot == "Pie" and len(selected_metrics) != 1:
-        st.warning("⚠️ Pie charts require selecting exactly **1 metric**. Please adjust the metric selection.")
-        return  # Stop here safely, no exception raised
 
-    if len(selected_metrics)==0:
-        st.warning("⚠️ Charts need at least **1 metric**. Please adjust the metric selection.")
-        return  # Stop here safely, no exception raised
+    #Make plot
+    accident_plot(df, selected_breakdown, selected_metric_labels, selected_metrics, selected_plot,"Dinamic_version")
+    return df, selected_breakdown, selected_metric_labels, selected_metrics, selected_plot
 
-    # ---------------------
-    # GENERATE DYNAMIC TITLE
-    # ---------------------
+# ---------------------     
 
-    # Human-friendly names for metrics
-    pretty_metric_labels = ", ".join(selected_metric_labels)
-
-    # Nice formatting for the breakdown
-    pretty_breakdown = selected_breakdown.replace("_", " ").capitalize()
-
-    # Pie rule: only one metric allowed
-    if selected_plot == "Pie":
-        title = f"{selected_metric_labels[0]} by {pretty_breakdown}"
-    else:
-        # Multiple metrics → pluralize
-        if len(selected_metric_labels) > 1:
-            title = f"Metrics ({pretty_metric_labels}) by {pretty_breakdown}"
-        else:
-            title = f"{selected_metric_labels[0]} by {pretty_breakdown}"
-
-    # Add plot type
-    title += f" — {selected_plot} plot"
-
-    # ---------------------
-    # AGGREGATION
-    # ---------------------
-
-    aggregated = pd.DataFrame()
-
-    for label, metric in zip(selected_metric_labels, selected_metrics):
-
-        if metric is None:
-            # Count accidents
-            grouped = (
-                df.groupby(selected_breakdown, observed=True)
-                  .size()
-                  .reset_index(name="value")
-            )
-            metric="Number of accidents"
-        else:
-            # Sum injuries/fatalities
-            grouped = (
-                df.groupby(selected_breakdown)[metric]
-                  .sum()
-                  .reset_index(name="value")
-            )
-
-        grouped["metric"] = label
-        aggregated = pd.concat([aggregated, grouped], ignore_index=True)
-
-    # Sort by breakdown for readability
-    aggregated = aggregated.sort_values(selected_breakdown)
-
-
-    # ---------------------
-    # PLOTTING
-    # ---------------------
-
-    try:
-        if selected_plot == "Bar":
-            fig = px.bar(
-                aggregated,
-                x=selected_breakdown,
-                y="value",
-                color="metric",
-                barmode="group",
-                text="value",
-                labels={selected_breakdown: selected_breakdown.capitalize(), "value": "Value"},
-                title=title
-            )
-            fig.update_traces(textposition="outside")
-
-        elif selected_plot == "Line":
-            fig = px.line(
-                aggregated,
-                x=selected_breakdown,
-                y="value",
-                color="metric",
-                markers=True,
-                labels={selected_breakdown: selected_breakdown.capitalize(), "value": "Value"},
-                title=title
-            )
-
-        elif selected_plot == "Pie":
-            # Only one metric here (validated above)
-            metric_label = selected_metric_labels[0]
-            filtered = aggregated[aggregated["metric"] == metric_label]
-
-            fig = px.pie(
-                filtered,
-                names=selected_breakdown,
-                values="value",
-                title=f"{title} — {metric_label}"
-            )
-
-
-        st.plotly_chart(fig, width='stretch')
-
-    except Exception as e:
-        st.error(f"❌ An error occurred during plotting: {e}")
-
-
-# ---------------------
 # 2️⃣ Plotting function
 # ---------------------
-def accident_plot(df, breakdown, metric_labels, metrics, plot_type):
+def accident_plot(df, breakdown, metric_labels, metrics, plot_type, key=None):
     """Generate the plot based on the selected parameters."""
 
     # ---------------------
@@ -234,8 +139,8 @@ def accident_plot(df, breakdown, metric_labels, metrics, plot_type):
                 values="value",
                 title=title
             )
-
-        st.plotly_chart(fig, width='stretch')
+        
+        st.plotly_chart(fig, width='stretch',key=key)
 
     except Exception as e:
         st.error(f"❌ An error occurred during plotting: {e}")
