@@ -1,16 +1,22 @@
 import streamlit as st
 from streamlit_folium import st_folium
-
+from streamlit.components.v1 import html
 from modules.load_data import load_accident_data, load_boundary
 from modules.stats import load_data,compute_overview, dataset_inspection
 from modules.temporal_filters import apply_temporal_filters
 from modules.severity_filters import apply_severity_filters
-from modules.map_utils import df_to_gdf, create_map
+from modules.map_utils import df_to_gdf, create_map 
 from modules.plots import accident_plot_controls, accident_plot
+
+
+
 
 st.set_page_config(page_title="Lisbon Road Accidents", layout="wide")
 st.title("Lisbon Road Accidents – Interactive Dashboard")
-
+st.markdown(
+    "👤 **Author:** [Luca Liebscht](https://www.linkedin.com/in/luca-liebscht-674987212/) | 🎓 Capstone Project – AIM4Mobility Training Programme",
+    unsafe_allow_html=True
+)
 # Load data
 try:
     df = load_accident_data()
@@ -99,23 +105,26 @@ st.markdown(
     "with **18 victims**."
 )
 
-# Apply sidebar filters
-st.sidebar.header("Filter Options")
-df_filtered = apply_temporal_filters(clean_df,False)
-df_filtered = apply_severity_filters(df_filtered,False)
 
 with st.expander("📊 Wanna explore more? Set your own filters!", expanded=True):
      accident_plot_controls(clean_df)
 
 
+#------------------------------------------------------
+# MAP & FILTERS
+#------------------------------------------------------
 
+col1, col2 = st.columns([3, 1])
 
+with col2:
+    st.header("Filters")
+    df_filtered = apply_temporal_filters(clean_df, container=st,expanded=True)
+    df_filtered = apply_severity_filters(df_filtered, container=st,expanded=True)
+with col1:
+    # Create map
+    gdf = df_to_gdf(df_filtered)
+    map_html = create_map(gdf, boundary_gdf)
+    # Display map
+    st.subheader("Accident Map")
+    st.components.v1.html(map_html, height=500, scrolling=False)
 
-# Create map
-gdf = df_to_gdf(df_filtered)
-map_html = create_map(gdf, boundary_gdf)
-# Display map
-st.subheader("Accident Map")
-st.components.v1.html(map_html, height=500, scrolling=False)
-
-# st_folium(m, width=800, height=600, returned_objects=None)
