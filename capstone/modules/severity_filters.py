@@ -1,11 +1,11 @@
 import pandas as pd
 import streamlit as st
 
-def apply_severity_filters(df):
+def apply_severity_filters(df, default=False):
     df_filtered = df.copy()
 
     #1 Severity filters
-    severity_toggle = st.sidebar.toggle("**Accident severity filters**", False)
+    severity_toggle = st.sidebar.toggle("**Accident severity filters**", default)
 
 
     if not severity_toggle:

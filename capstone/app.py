@@ -42,8 +42,8 @@ st.dataframe(df.head())
 
 # Apply sidebar filters
 st.sidebar.header("Filter Options")
-df_filtered = apply_temporal_filters(df)
-df_filtered = apply_severity_filters(df_filtered)
+df_filtered = apply_temporal_filters(df,False)
+df_filtered = apply_severity_filters(df_filtered,False)
 
 #Generate plots
 plot_accident_data(df_filtered)

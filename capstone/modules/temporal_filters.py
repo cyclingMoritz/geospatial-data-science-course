@@ -1,11 +1,11 @@
 import pandas as pd
 import streamlit as st
 
-def apply_temporal_filters(df):
+def apply_temporal_filters(df,default=False):
     df_filtered = df.copy()
     
     #1 Temporal filters
-    temporal_toggle = st.sidebar.toggle("**Temporal filters**", False)
+    temporal_toggle = st.sidebar.toggle("**Temporal filters**", default)
     #Generate the date attribute
     date_str = df["day"].astype(str).str.zfill(2) + " " + df["month"].astype(str) + " 2023"
     df_filtered["date"] = pd.to_datetime(date_str, errors="coerce")
@@ -15,7 +15,7 @@ def apply_temporal_filters(df):
         return df_filtered
 
     #2 Filter by values
-    if st.sidebar.toggle("Filter by value", True):
+    if st.sidebar.toggle("Filter by value", False):
         weekday_options = df["weekday"].dropna().unique()
         selected_weekdays = st.sidebar.multiselect(
             "Filter by Weekday", weekday_options, default=weekday_options
