@@ -9,6 +9,7 @@ def apply_temporal_filters(df,default=False):
     #Generate the date attribute
     date_str = df["day"].astype(str).str.zfill(2) + " " + df["month"].astype(str) + " 2023"
     df_filtered["date"] = pd.to_datetime(date_str, errors="coerce")
+    df_filtered["date_str"] = df_filtered["date"].dt.strftime("%d %b %Y")
 
 
     if not temporal_toggle:
