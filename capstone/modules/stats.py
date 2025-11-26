@@ -9,6 +9,22 @@ def load_data(df):
     clean_data["date_str"] = clean_data["date"].dt.strftime("%d %b %Y")
 
     # Make temporal attributes ordered
+    # ---- Fix ordering for month and weekday ----
+    MONTH_ORDER = ["Jan","Feb","Mar","Apr","May","Jun",
+                   "Jul","Aug","Sep","Oct","Nov","Dec"]
+
+    WEEKDAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
+
+    if "month" in clean_data.columns:
+        clean_data["month"] = pd.Categorical(clean_data["month"], categories=MONTH_ORDER, ordered=True)
+
+    if "weekday" in clean_data.columns:
+        clean_data["weekday"] = pd.Categorical(clean_data["weekday"], categories=WEEKDAY_ORDER, ordered=True)
+
+    #Calculate number of víctims
+    clean_data["total_victims"]=clean_data["minor_injuries_30d"]+ clean_data["serious_injuries_30d"]+clean_data["fatalities_30d"]
+
     return clean_data
 
 
