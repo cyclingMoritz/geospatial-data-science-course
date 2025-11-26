@@ -11,7 +11,9 @@ def df_to_gdf(df):
         geometry=[Point(xy) for xy in zip(df["longitude"], df["latitude"])],
         crs="EPSG:4326"
     )
-@st.cache_data
+
+
+# @st.cache_data
 def create_map(_gdf, _boundary_gdf):
 
     if len(_gdf) > 0:
