@@ -1,72 +1,51 @@
 import pandas as pd
 import streamlit as st
 
-def apply_severity_filters(df, default=False):
+def apply_severity_filters(df, container=st.sidebar, expanded=False):
+    """
+    Apply severity filters (minor, serious, fatal) to a dataframe.
+    Can render in sidebar, container, or column.
+    """
+
+
     df_filtered = df.copy()
-
-    #1 Severity filters
-    severity_toggle = st.sidebar.toggle("**Accident severity filters**", default)
-
-
-    if not severity_toggle:
-        return df_filtered
-
-    # 2 Light accidents
-    df_filtered = add_injury_filter(df_filtered,column="minor_injuries_30d",label="minor injuries")
-
-    #2 Severe accidents
-    df_filtered = add_injury_filter(df_filtered,column="serious_injuries_30d",label="severe injuries")
-
-    #2 Fatal accidents
-    df_filtered = add_injury_filter(df_filtered,column="fatalities_30d",label="fatalities")
-
+    with st.expander("**Accident severity filters**",expanded=expanded):
+        # ---- Minor injuries ----
+        df_filtered = add_injury_filter(df_filtered, column="minor_injuries_30d",
+                                        label="minor injuries", container=container)
+        # ---- Serious injuries ----
+        df_filtered = add_injury_filter(df_filtered, column="serious_injuries_30d",
+                                        label="serious injuries", container=container)
+        # ---- Fatalities ----
+        df_filtered = add_injury_filter(df_filtered, column="fatalities_30d",
+                                        label="fatalities", container=container)
 
     return df_filtered
 
 
-def add_injury_filter(
-    df: pd.DataFrame,
-    column: str,
-    label: str
-) -> pd.DataFrame:
+def add_injury_filter(df: pd.DataFrame, column: str, label: str, container=None) -> pd.DataFrame:
     """
-    Adds a sidebar filter for injury counts using a toggle, slider,
-    and a checkbox that forces only zero injuries.
-
-    Parameters
-    ----------
-    df : DataFrame
-        Original dataframe for min/max calculation.
-    column : str
-        Column name with injury counts.
-    label : str
-        Label shown in the slider.
-
-    Returns
-    -------
-    df_filtered : DataFrame
-        The filtered dataframe.
+    Adds a filter for injury counts using toggle, slider, and optional checkbox.
+    Works in any Streamlit container.
     """
+    if container is None:
+        container = st.sidebar  # fallback
 
-    if st.sidebar.toggle(f"Filter by number of {label}", False):
-
+    if container.toggle(f"Filter by number of {label}", False):
         # Checkbox option: only 0 injuries
-        only_zero = st.sidebar.checkbox(f"Only accidents with 0 {label.lower()}")
-
+        only_zero = container.checkbox(f"Only accidents with 0 {label.lower()}")
         if only_zero:
             return df[df[column] == 0]
 
         # Otherwise: slider
         min_val = int(df[column].min())
         max_val = int(df[column].max())
-
-        value_range = st.sidebar.slider(
+        value_range = container.slider(
             f"Victims with {label}",
             min_value=min_val,
             max_value=max_val,
             value=(min_val, max_val)
         )
-
         return df[df[column].between(*value_range)]
 
     return df
